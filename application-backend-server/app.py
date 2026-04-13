@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-import time, requests, os
+import time, requests, os, pymysql
 from jose import jwt
 
 ISSUER   = os.getenv("OIDC_ISSUER",   "http://authentication-identity-server:8080/realms/master")
@@ -17,8 +17,45 @@ def get_jwks():
 
 app = Flask(__name__)
 
+def get_db():
+    return pymysql.connect(
+        host='relational-database-server',
+        user='root',
+        password='root',
+        database='studentdb',
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
 @app.get("/hello")
 def hello(): return jsonify(message="Hello from App Server!")
+
+@app.get("/students-db")
+def students_db():
+    conn = get_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM students')
+            rows = cur.fetchall()
+    finally:
+        conn.close()
+
+    html = """
+    <html><head><style>
+        body { font-family: Arial; padding: 20px; }
+        h2 { color: #2e7d32; }
+        table { border-collapse: collapse; width: 100%; }
+        th { background: #2e7d32; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        tr:hover { background: #f5f5f5; }
+    </style></head><body>
+    <h2>Danh sách sinh viên (MariaDB)</h2>
+    <table>
+        <tr><th>#</th><th>Student ID</th><th>Fullname</th><th>DOB</th><th>Major</th></tr>
+    """
+    for i, r in enumerate(rows, 1):
+        html += f"<tr><td>{i}</td><td>{r['student_id']}</td><td>{r['fullname']}</td><td>{r['dob']}</td><td>{r['major']}</td></tr>"
+    html += "</table></body></html>"
+    return html
 
 @app.get("/secure")
 def secure():
