@@ -8,6 +8,8 @@ services:
   web-frontend-server1:
     build: ./web-frontend-server
     container_name: web-frontend-server1
+    environment:
+      SERVER_INSTANCE: "1"
     networks:
       - cloud-net
     # Không expose port riêng — truy cập qua api-gateway port 80
@@ -15,6 +17,8 @@ services:
   web-frontend-server2:
     build: ./web-frontend-server
     container_name: web-frontend-server2
+    environment:
+      SERVER_INSTANCE: "2"
     networks:
       - cloud-net
 

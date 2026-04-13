@@ -1,3 +1,31 @@
-<h1>mini cloud blog</h1> 
-<br>
-<a href="blog/blog1.html"> Go to Galaxy Web</a>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>MiniCloud — Web Server 1</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: #1e293b; border: 2px solid #3b82f6; border-radius: 16px; padding: 48px 56px; text-align: center; max-width: 480px; box-shadow: 0 0 40px rgba(59,130,246,0.3); }
+    .badge { display: inline-block; background: #3b82f6; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 16px; border-radius: 99px; letter-spacing: 2px; margin-bottom: 24px; }
+    h1 { font-size: 2rem; color: #60a5fa; margin-bottom: 8px; }
+    .subtitle { color: #94a3b8; margin-bottom: 32px; }
+    .info { background: #0f172a; border-radius: 10px; padding: 16px 24px; font-size: 14px; color: #7dd3fc; }
+    .server-num { font-size: 5rem; font-weight: 900; color: #3b82f6; opacity: 0.15; position: absolute; top: 10px; right: 20px; }
+  </style>
+</head>
+<body>
+  <div class="card" style="position:relative; overflow:hidden;">
+    <span class="server-num">①</span>
+    <div class="badge">WEB FRONTEND SERVER
+      <a href="blog/blog1.html">Blog</a>
+    </div>
+    <h1>🌐 MiniCloud</h1>
+    <p class="subtitle">Instance #1 — Round Robin Load Balancing</p>
+    <div class="info">
+      Hostname: <strong>web-frontend-server1</strong><br>
+      Port: 80 &nbsp;|&nbsp; Container IP: dynamic
+    </div>
+  </div>
+</body>
+</html>
