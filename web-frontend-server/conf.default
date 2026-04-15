@@ -7,7 +7,7 @@ server {
   location / { try_files $uri $uri/ =404; }
   location ^~ /blog/ {
     alias /usr/share/nginx/html/blog/;
-    index index1.html;
+    index index2.html;
     autoindex off;
   }
   location /stub_status {

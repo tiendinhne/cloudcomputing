@@ -6,8 +6,7 @@ services:
     container_name: web-frontend-server1
     environment:
       SERVER_INSTANCE: "1"
-    networks:
-      - cloud-net
+    networks: [cloud-net]
     # Không expose port riêng — truy cập qua api-gateway port 80
 
   web-frontend-server2:
@@ -15,8 +14,7 @@ services:
     container_name: web-frontend-server2
     environment:
       SERVER_INSTANCE: "2"
-    networks:
-      - cloud-net
+    networks: [cloud-net]
 
   application-backend-server:
     build: ./application-backend-server
@@ -25,8 +23,9 @@ services:
     networks: [cloud-net]
     ports: [ "8085:8081" ]
     environment:
-      OIDC_ISSUER:   "http://authentication-identity-server:8080/realms/master"
-      OIDC_AUDIENCE: "myapp"
+      OIDC_INTERNAL: "http://authentication-identity-server:8080"
+      OIDC_REALM: "realm_52300263"
+      OIDC_AUDIENCE: "account"
 
   relational-database-server:
     image: mariadb:11
@@ -51,6 +50,8 @@ services:
       KC_HTTP_ENABLED: "true"
     ports: [ "8081:8080" ]
     restart: unless-stopped
+    volumes:
+      - ./authentication-identity-server/data:/opt/keycloak/data
     networks: [cloud-net]
 
   object-storage-server:
@@ -100,7 +101,8 @@ services:
     image: nginx:stable
     container_name: api-gateway-proxy-server
     depends_on:
-      - web-frontend-server
+      - web-frontend-server1
+      - web-frontend-server2
       - application-backend-server
       - authentication-identity-server
     ports: [ "80:80" ]
@@ -112,7 +114,7 @@ services:
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
     container_name: nginx-exporter
-    command: ["--nginx.scrape-uri=http://web-frontend-server:80/stub_status"]
+    command: ["--nginx.scrape-uri=http://api-gateway-proxy-server:80/stub_status"]
     ports: ["9113:9113"]
     networks: [cloud-net]
-    depends_on: [web-frontend-server]
+    depends_on: [api-gateway-proxy-server]

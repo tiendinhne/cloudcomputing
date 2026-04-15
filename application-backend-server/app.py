@@ -2,9 +2,11 @@ from flask import Flask, jsonify, request
 import time, requests, os, pymysql
 from jose import jwt
 
-ISSUER   = os.getenv("OIDC_ISSUER",   "http://authentication-identity-server:8080/realms/master")
-AUDIENCE = os.getenv("OIDC_AUDIENCE", "myapp")
-JWKS_URL = f"{ISSUER}/protocol/openid-connect/certs"
+# Backend dùng tên nội bộ Docker để fetch JWKS (port 8080)
+_INTERNAL = os.getenv("OIDC_INTERNAL", "http://authentication-identity-server:8080")
+REALM     = os.getenv("OIDC_REALM",    "realm_52300263")
+AUDIENCE  = os.getenv("OIDC_AUDIENCE", "account")
+JWKS_URL  = f"{_INTERNAL}/realms/{REALM}/protocol/openid-connect/certs"
 
 _JWKS = None; _TS = 0
 def get_jwks():
@@ -64,8 +66,8 @@ def secure():
         return jsonify(error="Missing Bearer token"), 401
     token = auth.split(" ",1)[1]
     try:
-        payload = jwt.decode(token, get_jwks(), algorithms=["RS256"], audience=AUDIENCE, issuer=ISSUER)
-        return jsonify(message="Secure resource OK", preferred_username=payload.get("preferred_username"))
+        payload = jwt.decode(token, get_jwks(), algorithms=["RS256"], audience=AUDIENCE, options={"verify_iss": False})
+        return jsonify(message="Secure resource OK", preferred_username=payload.get("preferred_username"), email=payload.get("email"))
     except Exception as e:
         return jsonify(error=str(e)), 401
 
