@@ -1,6 +1,14 @@
 networks: { cloud-net: { name: cloud-net } }
 
 services:
+  web-frontend-server:
+    build: ./web-frontend-server
+    image: hotensv/web:dev
+    container_name: web-frontend-server
+    networks: [cloud-net]
+    ports: [ "8080:80" ]
+    # export port riêng để test web frontend 8080
+    
   web-frontend-server1:
     build: ./web-frontend-server
     container_name: web-frontend-server1
@@ -95,6 +103,9 @@ services:
     image: grafana/grafana:latest
     container_name: monitoring-grafana-dashboard-server
     ports: [ "3000:3000" ]
+    volumes:
+      - ./monitoring-grafana-dashboard-server/data:/var/lib/grafana
+    restart: unless-stopped
     networks: [cloud-net]
 
   api-gateway-proxy-server:
